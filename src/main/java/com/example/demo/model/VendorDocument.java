@@ -38,7 +38,7 @@ public class VendorDocument {
     }
 
     @PrePersist
-    protected void onCreate() {
+    protected void prePersist() {
         this.uploadedAt = LocalDateTime.now();
     }
 

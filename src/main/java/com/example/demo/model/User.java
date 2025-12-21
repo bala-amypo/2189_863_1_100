@@ -33,7 +33,7 @@ public class User {
     }
 
     @PrePersist
-    protected void onCreate() {
+    protected void prePersist() {
         this.createdAt = LocalDateTime.now();
         if (this.role == null) {
             this.role = "USER";

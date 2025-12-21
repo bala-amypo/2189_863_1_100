@@ -43,7 +43,7 @@ public class DocumentType {
     }
 
     @PrePersist
-    protected void onCreate() {
+    protected void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
 
