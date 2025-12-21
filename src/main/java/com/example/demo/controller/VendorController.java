@@ -16,18 +16,18 @@ public class VendorController {
         this.vendorService = vendorService;
     }
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<Vendor> createVendor(@RequestBody Vendor vendor) {
         return ResponseEntity.ok(vendorService.createVendor(vendor));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Vendor>> getAllVendors() {
+        return ResponseEntity.ok(vendorService.getAllVendors());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Vendor> getVendor(@PathVariable Long id) {
         return ResponseEntity.ok(vendorService.getVendor(id));
-    }
-
-    @GetMapping("/")
-    public ResponseEntity<List<Vendor>> getAllVendors() {
-        return ResponseEntity.ok(vendorService.getAllVendors());
     }
 }

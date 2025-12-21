@@ -16,10 +16,10 @@ public class VendorDocumentController {
         this.vendorDocumentService = vendorDocumentService;
     }
 
-    @PostMapping("/vendors/{vendorId}/types/{typeId}")
+    @PostMapping
     public ResponseEntity<VendorDocument> uploadDocument(
-            @PathVariable Long vendorId,
-            @PathVariable Long typeId,
+            @RequestParam Long vendorId,
+            @RequestParam Long typeId,
             @RequestBody VendorDocument document) {
         return ResponseEntity.ok(vendorDocumentService.uploadDocument(vendorId, typeId, document));
     }

@@ -16,12 +16,12 @@ public class DocumentTypeController {
         this.documentTypeService = documentTypeService;
     }
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<DocumentType> createDocumentType(@RequestBody DocumentType type) {
         return ResponseEntity.ok(documentTypeService.createDocumentType(type));
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<DocumentType>> getAllDocumentTypes() {
         return ResponseEntity.ok(documentTypeService.getAllDocumentTypes());
     }

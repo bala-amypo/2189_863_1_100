@@ -16,12 +16,12 @@ public class ComplianceRuleController {
         this.complianceRuleService = complianceRuleService;
     }
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<ComplianceRule> createRule(@RequestBody ComplianceRule rule) {
         return ResponseEntity.ok(complianceRuleService.createRule(rule));
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<ComplianceRule>> getAllRules() {
         return ResponseEntity.ok(complianceRuleService.getAllRules());
     }
