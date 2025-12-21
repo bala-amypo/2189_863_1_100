@@ -33,7 +33,7 @@ public class ComplianceRule {
     }
 
     @PrePersist
-    protected void onCreate() {
+    protected void prePersist() {
         this.createdAt = LocalDateTime.now();
         if (this.threshold == null) {
             this.threshold = 0.0;
