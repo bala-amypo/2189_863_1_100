@@ -1,5 +1,10 @@
 package com.example.demo.controller;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
+
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
 import org.springframework.http.ResponseEntity;
