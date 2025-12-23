@@ -1,8 +1,13 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.AuthRequest;
+import com.example.demo.dto.AuthResponse;
 import com.example.demo.model.User;
+import com.example.demo.security.JwtUtil;
 import com.example.demo.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -10,9 +15,11 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/register")
@@ -21,18 +28,15 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody AuthRequest request) {
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         User user = userService.findByEmail(request.getEmail());
-        return ResponseEntity.ok("Login successful for: " + user.getEmail());
-    }
-
-    public static class AuthRequest {
-        private String email;
-        private String password;
-
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
+        
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+            request.getEmail(), request.getPassword());
+        
+        String token = jwtUtil.generateToken(authentication, user.getId(), user.getEmail(), user.getRole());
+        
+        AuthResponse response = new AuthResponse(token, user.getId(), user.getEmail(), user.getRole());
+        return ResponseEntity.ok(response);
     }
 }
