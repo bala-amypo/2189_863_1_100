@@ -12,18 +12,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleResourceNotFoundException(ResourceNotFoundException ex) {
-        Map<String, String> response = new HashMap<>();
-        response.put("message", ex.getMessage());
-        response.put("status", 404);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<Map<String, String>> handleValidationException(ValidationException ex) {
-        Map<String, String> response = new HashMap<>();
-        response.put("message", ex.getMessage());
-        response.put("status", 400);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     // @ExceptionHandler(Exception.class)
