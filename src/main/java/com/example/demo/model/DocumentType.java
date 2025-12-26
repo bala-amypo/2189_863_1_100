@@ -1,51 +1,19 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "document_types")
 public class DocumentType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    private String typeName;
-
-    private String description;
-
-    private Boolean required;
-
-    private Integer weight;
-
-    private LocalDateTime createdAt;
-
-    @ManyToMany
-    @JoinTable(
-        name = "vendor_document_types",
-        joinColumns = @JoinColumn(name = "document_type_id"),
-        inverseJoinColumns = @JoinColumn(name = "vendor_id")
-    )
-    private Set<Vendor> vendors = new HashSet<>();
-
-    public DocumentType() {
-    }
-
-    public DocumentType(String typeName, String description, Boolean required, Integer weight) {
-        this.typeName = typeName;
-        this.description = description;
-        this.required = required;
-        this.weight = weight;
-    }
-
-    @PrePersist
-    protected void prePersist() {
-        this.createdAt = LocalDateTime.now();
-    }
+    private String name;
+    private boolean required;
+    private double weight;
 
     public Long getId() {
         return id;
@@ -55,44 +23,28 @@ public class DocumentType {
         this.id = id;
     }
 
-    public String getTypeName() {
-        return typeName;
+    public String getName() {
+        return name;
     }
 
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Boolean getRequired() {
+    public boolean isRequired() {
         return required;
     }
 
-    public void setRequired(Boolean required) {
+    public void setRequired(boolean required) {
         this.required = required;
     }
 
-    public Integer getWeight() {
+    public double getWeight() {
         return weight;
     }
 
-    public void setWeight(Integer weight) {
+    public void setWeight(double weight) {
         this.weight = weight;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 
     public Set<Vendor> getVendors() {
@@ -102,4 +54,15 @@ public class DocumentType {
     public void setVendors(Set<Vendor> vendors) {
         this.vendors = vendors;
     }
+
+    @ManyToMany(mappedBy = "supportedDocumentTypes")
+    private Set<Vendor> vendors = new HashSet<>();
+
+    @PrePersist
+    public void prePersist() {
+        if (weight <= 0) {
+            weight = 1.0;
+        }
+    }
+
 }
