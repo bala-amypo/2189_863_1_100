@@ -11,28 +11,19 @@ import java.util.List;
 @Service
 public class DocumentTypeServiceImpl implements DocumentTypeService {
 
-    private final DocumentTypeRepository documentTypeRepository;
+    private final DocumentTypeRepository repo;
 
-    public DocumentTypeServiceImpl(DocumentTypeRepository documentTypeRepository) {
-        this.documentTypeRepository = documentTypeRepository;
+    public DocumentTypeServiceImpl(DocumentTypeRepository repo) {
+        this.repo = repo;
     }
 
     @Override
-    public DocumentType createDocumentType(DocumentType type) {
-        if (documentTypeRepository.existsByTypeName(type.getTypeName())) {
-            throw new ValidationException("Duplicate document type");
-        }
-        return documentTypeRepository.save(type);
+    public DocumentType save(DocumentType type) {
+        return repo.save(type);
     }
 
     @Override
-    public List<DocumentType> getAllDocumentTypes() {
-        return documentTypeRepository.findAll();
-    }
-
-    @Override
-    public DocumentType getDocumentType(Long id) {
-        return documentTypeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("DocumentType not found"));
+    public List<DocumentType> findRequired() {
+        return repo.findByRequiredTrue();
     }
 }

@@ -16,50 +16,22 @@ import java.util.List;
 @Service
 public class VendorDocumentServiceImpl implements VendorDocumentService {
 
-    private final VendorDocumentRepository vendorDocumentRepository;
-    private final VendorRepository vendorRepository;
-    private final DocumentTypeRepository documentTypeRepository;
+    private final VendorDocumentRepository repo;
 
-    public VendorDocumentServiceImpl(
-            VendorDocumentRepository vendorDocumentRepository,
-            VendorRepository vendorRepository,
-            DocumentTypeRepository documentTypeRepository) {
-        this.vendorDocumentRepository = vendorDocumentRepository;
-        this.vendorRepository = vendorRepository;
-        this.documentTypeRepository = documentTypeRepository;
+    public VendorDocumentServiceImpl(VendorDocumentRepository repo) {
+        this.repo = repo;
     }
 
     @Override
-    public VendorDocument uploadDocument(Long vendorId, Long typeId, VendorDocument document) {
-        Vendor vendor = vendorRepository.findById(vendorId)
-                .orElseThrow(() -> new ResourceNotFoundException("Vendor not found"));
-        
-        DocumentType documentType = documentTypeRepository.findById(typeId)
-                .orElseThrow(() -> new ResourceNotFoundException("DocumentType not found"));
-        
-        if (document.getFileUrl() == null || document.getFileUrl().isEmpty()) {
-            throw new ValidationException("File URL is required");
+    public VendorDocument upload(VendorDocument doc) {
+        if (doc.getExpiryDate().isBefore(LocalDate.now())) {
+            throw new ValidationException("Document expired");
         }
-        
-        if (document.getExpiryDate() != null && document.getExpiryDate().isBefore(LocalDate.now())) {
-            throw new ValidationException("Expiry date cannot be in the past");
-        }
-        
-        document.setVendor(vendor);
-        document.setDocumentType(documentType);
-        document.setIsValid(document.getExpiryDate() == null || !document.getExpiryDate().isBefore(LocalDate.now()));
-        
-        return vendorDocumentRepository.save(document);
+        return repo.save(doc);
     }
 
     @Override
-    public List<VendorDocument> getDocumentsForVendor(Long vendorId) {
-        return vendorDocumentRepository.findByVendorId(vendorId);
-    }
-
-    @Override
-    public VendorDocument getDocument(Long id) {
-        return vendorDocumentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("VendorDocument not found"));
+    public List<VendorDocument> findExpired() {
+        return repo.findByExpiryDateBefore(LocalDate.now());
     }
 }
