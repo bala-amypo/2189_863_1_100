@@ -17,6 +17,9 @@ public class ComplianceScore {
     @ManyToOne
     private Vendor vendor;
 
+    public ComplianceScore() {
+    }
+
     public Long getId() {
         return id;
     }

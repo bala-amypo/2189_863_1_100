@@ -13,7 +13,10 @@ public class ComplianceRule {
     private String name;
 
     @Column(nullable = false)
-    private Double threshold = 0.0;
+    private Double threshold;
+
+    public ComplianceRule() {
+    }
 
     @PrePersist
     public void prePersist() {
@@ -22,11 +25,11 @@ public class ComplianceRule {
         }
     }
 
-    public Double getThreshold() {
-        return threshold;
-    }
-
     public Long getId() {
         return id;
+    }
+
+    public Double getThreshold() {
+        return threshold;
     }
 }

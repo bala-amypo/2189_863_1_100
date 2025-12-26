@@ -25,6 +25,9 @@ public class VendorDocument {
     @ManyToOne
     private DocumentType documentType;
 
+    public VendorDocument() {
+    }
+
     @PrePersist
     public void prePersist() {
         this.uploadedAt = LocalDateTime.now();

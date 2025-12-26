@@ -24,6 +24,9 @@ public class DocumentType {
     @ManyToMany(mappedBy = "supportedDocumentTypes")
     private Set<Vendor> vendors = new HashSet<>();
 
+    public DocumentType() {
+    }
+
     public Long getId() {
         return id;
     }
