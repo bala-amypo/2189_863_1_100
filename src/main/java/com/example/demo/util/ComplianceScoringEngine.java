@@ -1,36 +1,64 @@
 package com.example.demo.util;
 
+import com.example.demo.model.ComplianceScore;
 import com.example.demo.model.DocumentType;
+import com.example.demo.model.Vendor;
 import com.example.demo.model.VendorDocument;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Set;
 
 @Component
 public class ComplianceScoringEngine {
 
-    public static double calculateScore(
-            Set<DocumentType> requiredTypes,
-            List<VendorDocument> uploadedDocs) {
+    public ComplianceScore calculateScore(Vendor vendor) {
 
-        if (requiredTypes.isEmpty()) return 100.0;
+        ComplianceScore score = new ComplianceScore();
+        score.setVendor(vendor);
 
-        long validCount = requiredTypes.stream()
-            .filter(type ->
-                uploadedDocs.stream().anyMatch(doc ->
-                    doc.getDocumentType().equals(type)
-                    && doc.getExpiryDate().isAfter(LocalDate.now())
-                )
-            ).count();
+        Set<DocumentType> requiredTypes = vendor.getSupportedDocumentTypes();
 
-        return (validCount * 100.0) / requiredTypes.size();
+        // EDGE CASE: No required document types
+        if (requiredTypes == null || requiredTypes.isEmpty()) {
+            score.setScore(100.0);
+            score.setRating("EXCELLENT");
+            return score;
+        }
+
+        double totalWeight = 0.0;
+        double achievedWeight = 0.0;
+
+        for (DocumentType type : requiredTypes) {
+            totalWeight += type.getWeight();
+        }
+
+        for (DocumentType type : requiredTypes) {
+            boolean hasValidDoc = vendor.getSupportedDocumentTypes()
+                    .stream()
+                    .anyMatch(t -> t.getId().equals(type.getId()));
+
+            if (hasValidDoc) {
+                achievedWeight += type.getWeight();
+            }
+        }
+
+        double percentage = (achievedWeight / totalWeight) * 100.0;
+
+        score.setScore(percentage);
+        score.setRating(resolveRating(percentage));
+
+        return score;
     }
 
-    public static String rating(double score) {
-        if (score >= 90) return "EXCELLENT";
-        if (score >= 75) return "A";
-        if (score >= 60) return "B";
-        return "C";
+    private String resolveRating(double percentage) {
+        if (percentage >= 90.0) {
+            return "EXCELLENT";
+        } else if (percentage >= 75.0) {
+            return "GOOD";
+        } else if (percentage >= 50.0) {
+            return "AVERAGE";
+        }
+        return "POOR";
     }
 }
