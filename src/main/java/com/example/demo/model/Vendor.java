@@ -13,34 +13,10 @@ public class Vendor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    private String vendorName;
+    private String name;
 
-    private String email;
-
-    private String phone;
-
-    private String industry;
-
+    @Column(updatable = false)
     private LocalDateTime createdAt;
-
-    @ManyToMany(mappedBy = "vendors")
-    private Set<DocumentType> supportedDocumentTypes = new HashSet<>();
-
-    public Vendor() {
-    }
-
-    public Vendor(String vendorName, String email, String phone, String industry) {
-        this.vendorName = vendorName;
-        this.email = email;
-        this.phone = phone;
-        this.industry = industry;
-    }
-
-    @PrePersist
-    protected void prePersist() {
-        this.createdAt = LocalDateTime.now();
-    }
 
     public Long getId() {
         return id;
@@ -50,36 +26,12 @@ public class Vendor {
         this.id = id;
     }
 
-    public String getVendorName() {
-        return vendorName;
+    public String getName() {
+        return name;
     }
 
-    public void setVendorName(String vendorName) {
-        this.vendorName = vendorName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getIndustry() {
-        return industry;
-    }
-
-    public void setIndustry(String industry) {
-        this.industry = industry;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -97,4 +49,23 @@ public class Vendor {
     public void setSupportedDocumentTypes(Set<DocumentType> supportedDocumentTypes) {
         this.supportedDocumentTypes = supportedDocumentTypes;
     }
+
+    @ManyToMany
+    @JoinTable(
+        name = "vendor_document_types",
+        joinColumns = @JoinColumn(name = "vendor_id"),
+        inverseJoinColumns = @JoinColumn(name = "document_type_id")
+    )
+    private Set<DocumentType> supportedDocumentTypes = new HashSet<>();
+
+    @PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public void addDocumentType(DocumentType type) {
+        supportedDocumentTypes.add(type);
+        type.getVendors().add(this);
+    }
+
 }
