@@ -1,10 +1,12 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Table(name = "document_types")
 public class DocumentType {
 
     @Id
@@ -12,57 +14,41 @@ public class DocumentType {
     private Long id;
 
     private String name;
-    private boolean required;
-    private double weight;
+
+    @Column(nullable = false)
+    private Boolean required = true;
+
+    @Column(nullable = false)
+    private Double weight;
+
+    @ManyToMany(mappedBy = "supportedDocumentTypes")
+    private Set<Vendor> vendors = new HashSet<>();
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public boolean isRequired() {
+    public Boolean getRequired() {
         return required;
     }
 
-    public void setRequired(boolean required) {
-        this.required = required;
-    }
-
-    public double getWeight() {
+    public Double getWeight() {
         return weight;
-    }
-
-    public void setWeight(double weight) {
-        this.weight = weight;
     }
 
     public Set<Vendor> getVendors() {
         return vendors;
     }
 
-    public void setVendors(Set<Vendor> vendors) {
-        this.vendors = vendors;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    @ManyToMany(mappedBy = "supportedDocumentTypes")
-    private Set<Vendor> vendors = new HashSet<>();
-
-    @PrePersist
-    public void prePersist() {
-        if (weight <= 0) {
-            weight = 1.0;
-        }
+    public void setRequired(Boolean required) {
+        this.required = required;
     }
 
+    public void setWeight(Double weight) {
+        this.weight = weight;
+    }
 }
