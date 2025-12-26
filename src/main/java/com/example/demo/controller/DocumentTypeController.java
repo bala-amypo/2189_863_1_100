@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.model.DocumentType;
 import com.example.demo.service.DocumentTypeService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +11,11 @@ import java.util.List;
 @RequestMapping("/api/document-types")
 public class DocumentTypeController {
     
-    @Autowired
-    private DocumentTypeService documentTypeService;
+    private final DocumentTypeService documentTypeService;
+    
+    public DocumentTypeController(DocumentTypeService documentTypeService) {
+        this.documentTypeService = documentTypeService;
+    }
     
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping

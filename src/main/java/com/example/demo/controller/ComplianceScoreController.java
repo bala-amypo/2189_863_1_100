@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.model.ComplianceScore;
 import com.example.demo.service.ComplianceScoreService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +11,11 @@ import java.util.List;
 @RequestMapping("/api/compliance-scores")
 public class ComplianceScoreController {
     
-    @Autowired
-    private ComplianceScoreService complianceScoreService;
+    private final ComplianceScoreService complianceScoreService;
+    
+    public ComplianceScoreController(ComplianceScoreService complianceScoreService) {
+        this.complianceScoreService = complianceScoreService;
+    }
     
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/evaluate")

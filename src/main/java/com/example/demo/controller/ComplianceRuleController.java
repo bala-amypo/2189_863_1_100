@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.model.ComplianceRule;
 import com.example.demo.service.ComplianceRuleService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +11,11 @@ import java.util.List;
 @RequestMapping("/api/compliance-rules")
 public class ComplianceRuleController {
     
-    @Autowired
-    private ComplianceRuleService complianceRuleService;
+    private final ComplianceRuleService complianceRuleService;
+    
+    public ComplianceRuleController(ComplianceRuleService complianceRuleService) {
+        this.complianceRuleService = complianceRuleService;
+    }
     
     @PreAuthorize("isAuthenticated()")
     @PostMapping
