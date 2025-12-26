@@ -2,33 +2,26 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Vendor;
 import com.example.demo.service.VendorService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/vendors")
+@RequestMapping("/api/vendors")
 public class VendorController {
 
-    private final VendorService vendorService;
-
-    public VendorController(VendorService vendorService) {
-        this.vendorService = vendorService;
-    }
+    @Autowired
+    private VendorService vendorService;
 
     @PostMapping
     public ResponseEntity<Vendor> createVendor(@RequestBody Vendor vendor) {
-        return ResponseEntity.ok(vendorService.createVendor(vendor));
+        Vendor createdVendor = vendorService.createVendor(vendor);
+        return ResponseEntity.ok(createdVendor);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Vendor> getVendor(@PathVariable Long id) {
-        return ResponseEntity.ok(vendorService.getVendorById(id));
-    }
-
-    @GetMapping
-    public ResponseEntity<List<Vendor>> getAllVendors() {
-        return ResponseEntity.ok(vendorService.getAllVendors());
+        Vendor vendor = vendorService.getVendorById(id);
+        return ResponseEntity.ok(vendor);
     }
 }
