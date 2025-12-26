@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.model.VendorDocument;
 import com.example.demo.service.VendorDocumentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +11,11 @@ import java.util.List;
 @RequestMapping("/api/vendor-documents")
 public class VendorDocumentController {
     
-    @Autowired
-    private VendorDocumentService vendorDocumentService;
+    private final VendorDocumentService vendorDocumentService;
+    
+    public VendorDocumentController(VendorDocumentService vendorDocumentService) {
+        this.vendorDocumentService = vendorDocumentService;
+    }
     
     @PreAuthorize("isAuthenticated()")
     @PostMapping
