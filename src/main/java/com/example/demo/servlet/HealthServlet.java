@@ -7,16 +7,12 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/health")
+@WebServlet(urlPatterns = "/health")
 public class HealthServlet extends HttpServlet {
 
-    public HealthServlet() {
-    }
-
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("application/json");
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().write("{\"status\":\"UP\"}");
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setStatus(HttpServletResponse.SC_OK);
+        resp.getWriter().write("OK");
     }
 }

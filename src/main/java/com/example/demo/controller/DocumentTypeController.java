@@ -4,10 +4,11 @@ import com.example.demo.model.DocumentType;
 import com.example.demo.service.DocumentTypeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/document-types")
+@RequestMapping("/document-types")
 public class DocumentTypeController {
 
     private final DocumentTypeService documentTypeService;
@@ -17,17 +18,12 @@ public class DocumentTypeController {
     }
 
     @PostMapping
-    public ResponseEntity<DocumentType> createDocumentType(@RequestBody DocumentType type) {
-        return ResponseEntity.ok(documentTypeService.createDocumentType(type));
+    public ResponseEntity<DocumentType> create(@RequestBody DocumentType type) {
+        return ResponseEntity.ok(documentTypeService.create(type));
     }
 
     @GetMapping
-    public ResponseEntity<List<DocumentType>> getAllDocumentTypes() {
-        return ResponseEntity.ok(documentTypeService.getAllDocumentTypes());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<DocumentType> getDocumentType(@PathVariable Long id) {
-        return ResponseEntity.ok(documentTypeService.getDocumentType(id));
+    public ResponseEntity<List<DocumentType>> getAll() {
+        return ResponseEntity.ok(documentTypeService.getAll());
     }
 }
