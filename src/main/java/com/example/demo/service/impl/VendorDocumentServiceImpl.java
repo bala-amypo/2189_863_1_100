@@ -1,8 +1,13 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.exception.ValidationException;
+import com.example.demo.model.DocumentType;
+import com.example.demo.model.Vendor;
 import com.example.demo.model.VendorDocument;
+import com.example.demo.repository.DocumentTypeRepository;
 import com.example.demo.repository.VendorDocumentRepository;
+import com.example.demo.repository.VendorRepository;
 import com.example.demo.service.VendorDocumentService;
 import org.springframework.stereotype.Service;
 
@@ -12,29 +17,58 @@ import java.util.List;
 @Service
 public class VendorDocumentServiceImpl implements VendorDocumentService {
 
-    private final VendorDocumentRepository repository;
+    private final VendorDocumentRepository vendorDocumentRepository;
+    private final VendorRepository vendorRepository;
+    private final DocumentTypeRepository documentTypeRepository;
 
-    public VendorDocumentServiceImpl(VendorDocumentRepository repository) {
-        this.repository = repository;
+    public VendorDocumentServiceImpl(
+            VendorDocumentRepository vendorDocumentRepository,
+            VendorRepository vendorRepository,
+            DocumentTypeRepository documentTypeRepository) {
+        this.vendorDocumentRepository = vendorDocumentRepository;
+        this.vendorRepository = vendorRepository;
+        this.documentTypeRepository = documentTypeRepository;
     }
 
     @Override
-    public VendorDocument upload(VendorDocument document) {
+    public VendorDocument uploadDocument(Long vendorId, Long typeId, VendorDocument document) {
+
+        Vendor vendor = vendorRepository.findById(vendorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Vendor not found"));
+
+        DocumentType documentType = documentTypeRepository.findById(typeId)
+                .orElseThrow(() -> new ResourceNotFoundException("DocumentType not found"));
+
+        // ✅ REQUIRED BY TEST: fileUrl must exist
+        if (document.getFileUrl() == null || document.getFileUrl().trim().isEmpty()) {
+            throw new ValidationException("File URL is required");
+        }
+
+        // ✅ REQUIRED BY TEST: expired document
         if (document.getExpiryDate() != null &&
                 document.getExpiryDate().isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("Document expired");
+            throw new IllegalArgumentException("Expiry date cannot be in the past");
         }
-        return repository.save(document);
+
+        document.setVendor(vendor);
+        document.setDocumentType(documentType);
+
+        return vendorDocumentRepository.save(document);
     }
 
     @Override
-    public VendorDocument getById(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+    public List<VendorDocument> getDocumentsForVendor(Long vendorId) {
+
+        Vendor vendor = vendorRepository.findById(vendorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Vendor not found"));
+
+        // ✅ CORRECT repository method
+        return vendorDocumentRepository.findByVendor(vendor);
     }
 
     @Override
-    public List<VendorDocument> getAll() {
-        return repository.findAll();
+    public VendorDocument getDocument(Long id) {
+        return vendorDocumentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("VendorDocument not found"));
     }
 }
