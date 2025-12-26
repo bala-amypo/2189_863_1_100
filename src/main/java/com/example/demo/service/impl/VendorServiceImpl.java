@@ -11,28 +11,21 @@ import java.util.List;
 @Service
 public class VendorServiceImpl implements VendorService {
 
-    private final VendorRepository vendorRepository;
+    private final VendorRepository repo;
 
-    public VendorServiceImpl(VendorRepository vendorRepository) {
-        this.vendorRepository = vendorRepository;
+    public VendorServiceImpl(VendorRepository repo) {
+        this.repo = repo;
     }
 
     @Override
-    public Vendor createVendor(Vendor vendor) {
-        if (vendorRepository.existsByVendorName(vendor.getVendorName())) {
-            throw new ValidationException("Duplicate vendor name");
-        }
-        return vendorRepository.save(vendor);
+    public Vendor create(Vendor vendor) {
+        return repo.save(vendor);
     }
 
     @Override
-    public Vendor getVendor(Long id) {
-        return vendorRepository.findById(id)
+    public Vendor getById(Long id) {
+        return repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Vendor not found"));
     }
-
-    @Override
-    public List<Vendor> getAllVendors() {
-        return vendorRepository.findAll();
-    }
 }
+
