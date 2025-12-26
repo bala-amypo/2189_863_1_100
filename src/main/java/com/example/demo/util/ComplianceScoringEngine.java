@@ -1,64 +1,50 @@
 package com.example.demo.util;
 
-import com.example.demo.model.ComplianceScore;
 import com.example.demo.model.DocumentType;
-import com.example.demo.model.Vendor;
 import com.example.demo.model.VendorDocument;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
-@Component
 public class ComplianceScoringEngine {
 
-    public ComplianceScore calculateScore(Vendor vendor) {
-
-        ComplianceScore score = new ComplianceScore();
-        score.setVendor(vendor);
-
-        Set<DocumentType> requiredTypes = vendor.getSupportedDocumentTypes();
-
-        // EDGE CASE: No required document types
-        if (requiredTypes == null || requiredTypes.isEmpty()) {
-            score.setScore(100.0);
-            score.setRating("EXCELLENT");
-            return score;
-        }
-
-        double totalWeight = 0.0;
-        double achievedWeight = 0.0;
-
-        for (DocumentType type : requiredTypes) {
-            totalWeight += type.getWeight();
-        }
-
-        for (DocumentType type : requiredTypes) {
-            boolean hasValidDoc = vendor.getSupportedDocumentTypes()
-                    .stream()
-                    .anyMatch(t -> t.getId().equals(type.getId()));
-
-            if (hasValidDoc) {
-                achievedWeight += type.getWeight();
-            }
-        }
-
-        double percentage = (achievedWeight / totalWeight) * 100.0;
-
-        score.setScore(percentage);
-        score.setRating(resolveRating(percentage));
-
-        return score;
+    private ComplianceScoringEngine() {
+        // utility class
     }
 
-    private String resolveRating(double percentage) {
-        if (percentage >= 90.0) {
-            return "EXCELLENT";
-        } else if (percentage >= 75.0) {
-            return "GOOD";
-        } else if (percentage >= 50.0) {
-            return "AVERAGE";
+    public static double calculateScore(
+            List<DocumentType> requiredTypes,
+            List<VendorDocument> vendorDocuments
+    ) {
+
+        // Edge case: no required document types
+        if (requiredTypes == null || requiredTypes.isEmpty()) {
+            return 100.0;
         }
-        return "POOR";
+
+        long validCount = requiredTypes.stream()
+                .filter(type ->
+                        vendorDocuments.stream().anyMatch(doc ->
+                                doc.getDocumentType().getId().equals(type.getId())
+                                        && doc.getExpiryDate() != null
+                                        && doc.getExpiryDate().isAfter(LocalDate.now())
+                        )
+                )
+                .count();
+
+        return (validCount * 100.0) / requiredTypes.size();
+    }
+
+    public static String getRating(double score) {
+
+        if (score >= 90.0) {
+            return "EXCELLENT";
+        } else if (score >= 75.0) {
+            return "A";
+        } else if (score >= 60.0) {
+            return "B";
+        } else {
+            return "C";
+        }
     }
 }
