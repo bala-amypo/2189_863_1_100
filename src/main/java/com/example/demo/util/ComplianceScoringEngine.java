@@ -5,41 +5,32 @@ import com.example.demo.model.VendorDocument;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class ComplianceScoringEngine {
 
-    public double calculateScore(List<DocumentType> requiredTypes, List<VendorDocument> vendorDocuments) {
-        if (requiredTypes.isEmpty()) {
-            return 100.0;
-        }
+    public static double calculateScore(
+            Set<DocumentType> requiredTypes,
+            List<VendorDocument> uploadedDocs) {
 
-        double totalWeight = requiredTypes.stream().mapToInt(DocumentType::getWeight).sum();
-        double achievedWeight = 0.0;
+        if (requiredTypes.isEmpty()) return 100.0;
 
-        for (DocumentType type : requiredTypes) {
-            boolean hasValidDocument = vendorDocuments.stream()
-                    .anyMatch(doc -> doc.getDocumentType().getId().equals(type.getId()) 
-                            && Boolean.TRUE.equals(doc.getIsValid())
-                            && (doc.getExpiryDate() == null || !doc.getExpiryDate().isBefore(LocalDate.now())));
-            if (hasValidDocument) {
-                achievedWeight += type.getWeight();
-            }
-        }
+        long validCount = requiredTypes.stream()
+            .filter(type ->
+                uploadedDocs.stream().anyMatch(doc ->
+                    doc.getDocumentType().equals(type)
+                    && doc.getExpiryDate().isAfter(LocalDate.now())
+                )
+            ).count();
 
-        return totalWeight > 0 ? (achievedWeight / totalWeight) * 100 : 100.0;
+        return (validCount * 100.0) / requiredTypes.size();
     }
 
-    public String deriveRating(double score) {
-        if (score >= 90) {
-            return "EXCELLENT";
-        } else if (score >= 70) {
-            return "GOOD";
-        } else if (score >= 50) {
-            return "POOR";
-        } else {
-            return "NONCOMPLIANT";
-        }
+    public static String rating(double score) {
+        if (score >= 90) return "EXCELLENT";
+        if (score >= 75) return "A";
+        if (score >= 60) return "B";
+        return "C";
     }
 }
