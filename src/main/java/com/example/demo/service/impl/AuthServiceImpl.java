@@ -11,12 +11,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-AuthResponse response = new AuthResponse();
-response.setUserId(user.getId());
-response.setEmail(user.getEmail());
-response.setRole(user.getRole());
-return response;
-
 
 @Service
 public class AuthServiceImpl implements AuthService {
