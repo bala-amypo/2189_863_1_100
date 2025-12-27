@@ -29,6 +29,7 @@ public class Vendor {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @JsonManagedReference
     @ManyToMany
     @JoinTable(
         name = "vendor_document_types",
