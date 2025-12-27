@@ -15,17 +15,14 @@ public class JwtUtil {
     private static final String SECRET_KEY =
             "mysecretkeymysecretkeymysecretkey";
 
-    // 🔹 Extract username (email)
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // 🔹 Extract expiration
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    // 🔹 Generic claim extractor
     public <T> T extractClaim(
             String token,
             Function<Claims, T> claimsResolver
@@ -34,7 +31,6 @@ public class JwtUtil {
         return claimsResolver.apply(claims);
     }
 
-    // 🔹 Parse JWT
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .setSigningKey(SECRET_KEY)
@@ -42,12 +38,10 @@ public class JwtUtil {
                 .getBody();
     }
 
-    // 🔹 Expiry check
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    // 🔹 Validate token
     public boolean validateToken(
             String token,
             UserDetails userDetails
@@ -57,23 +51,15 @@ public class JwtUtil {
                 && !isTokenExpired(token);
     }
 
-    // 🔹 Generate token
-    public String generateToken(
-        Authentication authentication,
-        Long userId,
-        String email,
-        String role
-) {
-    return Jwts.builder()
-            .setSubject(email)
-            .claim("userId", userId)
-            .claim("role", role)
-            .setIssuedAt(new Date())
-            .setExpiration(
-                    new Date(System.currentTimeMillis() + 60 * 60 * 1000)
-            )
-            .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
-            .compact();
-}
-
+    // ✅ ONLY THIS generateToken METHOD
+    public String generateToken(UserDetails userDetails) {
+        return Jwts.builder()
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(
+                        new Date(System.currentTimeMillis() + 60 * 60 * 1000)
+                )
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .compact();
+    }
 }
