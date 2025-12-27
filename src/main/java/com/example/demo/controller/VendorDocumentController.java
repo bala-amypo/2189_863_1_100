@@ -18,10 +18,10 @@ public class VendorDocumentController {
     }
     
     @PreAuthorize("isAuthenticated()")
-    @PostMapping
+    @PostMapping("/vendor/{vendorId}/type/{typeId}")
     public ResponseEntity<VendorDocument> uploadDocument(
-            @RequestParam Long vendorId,
-            @RequestParam Long typeId,
+            @PathVariable Long vendorId,
+            @PathVariable Long typeId,
             @RequestBody VendorDocument document) {
         VendorDocument uploaded = vendorDocumentService.uploadDocument(vendorId, typeId, document);
         return ResponseEntity.ok(uploaded);
