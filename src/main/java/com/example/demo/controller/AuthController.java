@@ -7,7 +7,8 @@ import com.example.demo.security.JwtUtil;
 import com.example.demo.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,17 +33,23 @@ public class AuthController {
     }
     
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
-        User user = userService.findByEmail(authRequest.getEmail());
-        
-        if (passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
-            Authentication auth = new UsernamePasswordAuthenticationToken(user.getEmail(), null);
-            String token = jwtUtil.generateToken(auth, user.getId(), user.getEmail(), user.getRole());
-            
-            AuthResponse response = new AuthResponse(token, user.getId(), user.getEmail(), user.getRole());
-            return ResponseEntity.ok(response);
-        }
-        
-        return ResponseEntity.badRequest().build();
-    }
+public AuthResponse login(@RequestBody AuthRequest request) {
+
+    authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                    request.getEmail(),
+                    request.getPassword()
+            )
+    );
+
+    // 🔑 Load UserDetails
+    UserDetails userDetails =
+            userDetailsService.loadUserByUsername(request.getEmail());
+
+    // ✅ Correct JWT generation
+    String token = jwtUtil.generateToken(userDetails);
+
+    return new AuthResponse(token);
+}
+
 }
