@@ -58,14 +58,22 @@ public class JwtUtil {
     }
 
     // 🔹 Generate token
-    public String generateToken(UserDetails userDetails) {
-        return Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date())
-                .setExpiration(
-                        new Date(System.currentTimeMillis() + 60 * 60 * 1000)
-                )
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
-                .compact();
-    }
+    public String generateToken(
+        Authentication authentication,
+        Long userId,
+        String email,
+        String role
+) {
+    return Jwts.builder()
+            .setSubject(email)
+            .claim("userId", userId)
+            .claim("role", role)
+            .setIssuedAt(new Date())
+            .setExpiration(
+                    new Date(System.currentTimeMillis() + 60 * 60 * 1000)
+            )
+            .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+            .compact();
+}
+
 }
