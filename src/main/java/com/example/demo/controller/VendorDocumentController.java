@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.model.VendorDocument;
 import com.example.demo.service.VendorDocumentService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class VendorDocumentController {
     }
     
     @PostMapping("/vendor/{vendorId}/type/{typeId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<VendorDocument> uploadDocument(
             @PathVariable Long vendorId,
             @PathVariable Long typeId,
